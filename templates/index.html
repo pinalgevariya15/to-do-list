@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced To-Do List</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: #eef2f3;
+            display: flex;
+            justify-content: center; 
+            padding: 50px;
+            
+        }
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 350px;
+            background: linear-gradient(135deg, #a0b9e0 0%, #12284d 100%);
+        }
+
+        h2 { 
+            text-align: center; 
+            color: #091b2d; 
+        }
+        
+        .input-group {
+             display: flex;
+              gap: 5px; 
+            }
+        input[type="text"] {
+             flex-grow: 1; 
+             padding: 10px; 
+             border: 1px solid #ddd; 
+             border-radius: 6px;
+             }
+        .add-btn {
+             padding: 10px 15px; 
+             background: #e33f8c; 
+             color: white; 
+             border: none; 
+             border-radius: 6px; 
+             cursor: pointer; 
+            }
+        
+        ul {
+             list-style: none; 
+             padding: 0; 
+             margin-top: 25px; 
+            }
+        li { 
+            background: #fff; 
+            border-bottom: 1px solid #eee; 
+            padding: 7px 5px; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            border-radius: 10px;
+            transition:0.3s; 
+            transform:scale(1.05);
+            margin-bottom: 10px;
+        }
+        
+        .task-text {
+             flex-grow: 1; 
+             color: #333; 
+            }
+        .completed { 
+            text-decoration: line-through; 
+            color: #888; 
+        }
+        
+        .actions {
+             display: flex; 
+             gap: 12px; 
+             align-items: center; 
+            }
+        .edit-btn { 
+            cursor: pointer; 
+            color: #f39c12; 
+            text-decoration: none; 
+            font-size: 18px; 
+        }
+        .delete-btn {
+             cursor: pointer; 
+             color: #e74c3c; 
+             text-decoration: none; 
+             font-size: 20px; 
+             font-weight: bold; 
+            }
+        
+        input[type="checkbox"] {
+             transform: scale(1.2);
+              cursor: pointer; 
+            }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>To-Do List</h2>
+        
+        <form action="/add" method="POST" class="input-group">
+            <input type="text" name="todo" placeholder="What needs to be done?" required>
+            <button type="submit" class="add-btn">Add</button>
+        </form>
+
+        <ul>
+            {% for todo in todos %}
+            <li>
+                <input type="checkbox" {% if todo.completed %}checked{% endif %} 
+                       onclick="window.location.href='/toggle/{{ loop.index0 }}'">
+                
+                <span class="task-text {% if todo.completed %}completed{% endif %}">
+                    {{ todo.task }}
+                </span>
+
+                <div class="actions">
+                    <a href="#" class="edit-btn" onclick="editTask({{ loop.index0 }}, '{{ todo.task }}')">✎</a>
+                    <a href="/delete/{{ loop.index0 }}" class="delete-btn">×</a>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <script>
+        function editTask(index, currentText) {
+            let newTask = prompt("Edit your task:", currentText);
+            if (newTask !== null && newTask.trim() !== "") {
+                // Create a temporary form to submit the edit
+                let form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/edit/' + index;
+                
+                let input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'new_task';
+                input.value = newTask;
+                
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+    </script>
+</body>
+</html>
